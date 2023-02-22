@@ -13,6 +13,7 @@ void main() {
     WidgetsFlutterBinding.ensureInitialized();
     InitialBindings().dependencies();
     await widgetTester.pumpWidget(const MyApp());
+    await widgetTester.pump(const Duration(seconds: 5));
 
     expect(find.byType(HomePage), findsOneWidget);
 
