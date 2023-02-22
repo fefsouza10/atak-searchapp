@@ -45,6 +45,7 @@ class HomePage extends GetView<HomePageController> {
                                   controller.resetPage(),
                                   await controller
                                       .fetchSearchResultModelWithCheerio(
+                                          token: controller.token,
                                           query: controller.query,
                                           page: controller.page)
                                 }),
@@ -57,6 +58,7 @@ class HomePage extends GetView<HomePageController> {
                                   controller.resetPage(),
                                   await controller
                                       .fetchSearchResultModelWithPuppeteer(
+                                          token: controller.token,
                                           query: controller.query,
                                           page: controller.page)
                                 }),

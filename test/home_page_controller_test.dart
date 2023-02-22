@@ -8,10 +8,13 @@ void main() async {
   const mockQuery = 'Maringá';
   const mockPage = 0;
 
-  List<SearchResultModel> searchResultModelListFromPuppeteer = await controller
-      .fetchSearchResultModelWithPuppeteer(query: mockQuery, page: mockPage);
-  List<SearchResultModel> searchResultModelListFromCheerio = await controller
-      .fetchSearchResultModelWithCheerio(query: mockQuery, page: mockPage);
+  final String token = await controller.loginAndGetJWTBearerToken();
+  List<SearchResultModel> searchResultModelListFromPuppeteer =
+      await controller.fetchSearchResultModelWithPuppeteer(
+          token: token, query: mockQuery, page: mockPage);
+  List<SearchResultModel> searchResultModelListFromCheerio =
+      await controller.fetchSearchResultModelWithCheerio(
+          token: token, query: mockQuery, page: mockPage);
 
   group('Testing fetch search results with both Puppeteer and Cheerio:', () {
     test('Search results from Puppeteer list should contain at least 3 items.',
