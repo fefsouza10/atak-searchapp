@@ -8,6 +8,8 @@ enum LastSearchEngineUsed { puppeteer, cheerio }
 
 class HomePageController extends GetxController with StateMixin {
   final SearchResultService searchResultService = SearchResultService();
+  String token = '';
+
   String query = '';
   int page = 0;
   String pageNumber = '1';
@@ -19,19 +21,25 @@ class HomePageController extends GetxController with StateMixin {
   Future<void> onInit() async {
     super.onInit();
     change(null, status: RxStatus.loading());
-
+    token = await loginAndGetJWTBearerToken();
     change(null, status: RxStatus.success());
   }
 
+  Future<String> loginAndGetJWTBearerToken() async {
+    return await searchResultService.loginAndGetJWTBearerToken();
+  }
+
   Future<List<SearchResultModel>> fetchSearchResultModelWithPuppeteer({
+    required String token,
     required String query,
     required int page,
   }) async {
     if (query.isNotEmpty) {
       enableLoading();
       lastSearchEngineUsed = LastSearchEngineUsed.puppeteer;
-      searchResultList = await searchResultService
-          .fetchSearchResultModelWithPuppeteer(query: query, page: page);
+      searchResultList =
+          await searchResultService.fetchSearchResultModelWithPuppeteer(
+              token: token, query: query, page: page);
       disableLoading();
       update();
     } else {
@@ -41,14 +49,16 @@ class HomePageController extends GetxController with StateMixin {
   }
 
   Future<List<SearchResultModel>> fetchSearchResultModelWithCheerio({
+    required String token,
     required String query,
     required int page,
   }) async {
     if (query.isNotEmpty) {
       enableLoading();
       lastSearchEngineUsed = LastSearchEngineUsed.cheerio;
-      searchResultList = await searchResultService
-          .fetchSearchResultModelWithCheerio(query: query, page: page);
+      searchResultList =
+          await searchResultService.fetchSearchResultModelWithCheerio(
+              token: token, query: query, page: page);
       disableLoading();
       update();
     } else {
@@ -63,8 +73,10 @@ class HomePageController extends GetxController with StateMixin {
       page = page - 10;
       subPageNumber();
       lastSearchEngineUsed == LastSearchEngineUsed.puppeteer
-          ? await fetchSearchResultModelWithPuppeteer(query: query, page: page)
-          : await fetchSearchResultModelWithCheerio(query: query, page: page);
+          ? await fetchSearchResultModelWithPuppeteer(
+              token: token, query: query, page: page)
+          : await fetchSearchResultModelWithCheerio(
+              token: token, query: query, page: page);
     } else {
       Get.snackbar(
           'Página anterior inexistente!', 'Você já está na primeira página.',
@@ -79,9 +91,11 @@ class HomePageController extends GetxController with StateMixin {
     page = page + 10;
     addPageNumber();
     if (lastSearchEngineUsed == LastSearchEngineUsed.puppeteer) {
-      await fetchSearchResultModelWithPuppeteer(query: query, page: page);
+      await fetchSearchResultModelWithPuppeteer(
+          token: token, query: query, page: page);
     } else {
-      await fetchSearchResultModelWithCheerio(query: query, page: page);
+      await fetchSearchResultModelWithCheerio(
+          token: token, query: query, page: page);
     }
   }
 
